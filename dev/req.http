@@ -1,0 +1,35 @@
+# Sign up
+POST http://localhost:1337/api/user/new
+Content-Type: application/x-www-form-urlencoded
+
+username=Spyke&password=qwerty
+
+###
+# Log in
+POST http://localhost:1337/api/user/login
+Content-Type: application/x-www-form-urlencoded
+
+username=Spyke&password=qwerty
+
+###
+# Wrong credentials
+POST http://localhost:1337/api/user/login
+Content-Type: application/x-www-form-urlencoded
+
+username=Spyke&password=qwerte
+
+###
+# Logged in 404
+POST http://localhost:1337/api/user/log
+Content-Type: application/x-www-form-urlencoded
+Cookie: uid=Spyke; sign=3s6Kz6koTCrG-nztextuJ1-mbpeA9FiTtp0j2ez4oGA=;
+
+username=Spyke&password=qwerte
+
+###
+# Create new lobby
+POST http://localhost:1337/api/lobby/create
+Content-Type: application/x-www-form-urlencoded
+Cookie: uid=Spyke; sign=3s6Kz6koTCrG-nztextuJ1-mbpeA9FiTtp0j2ez4oGA=;
+
+###
