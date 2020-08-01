@@ -25,7 +25,7 @@ type McBoard struct {
 	NextPlayer int      `json:"next_player"`
 }
 
-func newBoard() McBoard {
+func newBoard() *McBoard {
 	length := 6
 	result := McBoard{
 		P1score: 0,
@@ -42,6 +42,8 @@ func newBoard() McBoard {
 		result.P2cells[i].Score = 4
 		result.P1cells[i].owner = 1
 		result.P2cells[i].owner = 2
+		result.P1cells[i].board = &result
+		result.P2cells[i].board = &result
 	}
 	result.P1cells[length-1].Score = 4
 	result.P2cells[length-1].Score = 4
@@ -51,9 +53,14 @@ func newBoard() McBoard {
 	result.P2cells[length-1].next = &result.P2mc
 	result.P1cells[length-1].opposite = &result.P2cells[0]
 	result.P2cells[length-1].opposite = &result.P2cells[0]
+	result.P1cells[length-1].board = &result
+	result.P2cells[length-1].board = &result
 	result.P1mc.next = &result.P2cells[0]
 	result.P2mc.next = &result.P1cells[0]
-	return result
+	result.P1mc.board = &result
+	result.P2mc.board = &result
+	result.NextPlayer = 1
+	return &result
 }
 
 func (board McBoard) endGame() GameResult {

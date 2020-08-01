@@ -1,15 +1,29 @@
-# Sign up
+# Sign up 1
 POST http://localhost:1337/api/user/new
 Content-Type: application/x-www-form-urlencoded
 
 username=Spyke&password=qwerty
 
 ###
-# Log in
+# Sign up 2
+POST http://localhost:1337/api/user/new
+Content-Type: application/x-www-form-urlencoded
+
+username=Vlad&password=abcd
+
+###
+# Log in 1
 POST http://localhost:1337/api/user/login
 Content-Type: application/x-www-form-urlencoded
 
 username=Spyke&password=qwerty
+
+###
+# Log in 2
+POST http://localhost:1337/api/user/login
+Content-Type: application/x-www-form-urlencoded
+
+username=Vlad&password=abcd
 
 ###
 # Wrong credentials
@@ -27,9 +41,35 @@ Cookie: uid=Spyke; sign=3s6Kz6koTCrG-nztextuJ1-mbpeA9FiTtp0j2ez4oGA=;
 username=Spyke&password=qwerte
 
 ###
-# Create new lobby
+# Spyke creates new lobby
 POST http://localhost:1337/api/lobby/create
 Content-Type: application/x-www-form-urlencoded
 Cookie: uid=Spyke; sign=3s6Kz6koTCrG-nztextuJ1-mbpeA9FiTtp0j2ez4oGA=;
 
+> {%
+    client.log(response.body)
+    client.global.set("roomId", response.body);
+    client.log(client.global.get("roomId"))
+%}
+###
+# Vlad joins
+POST http://localhost:1337/api/lobby/join
+Content-Type: application/x-www-form-urlencoded
+Cookie: uid=Vlad; sign=K66tmXIwFRn_MxiH6F7pMUQzqqTjCBLbZZ-7fvhdzGA=;
+
+room={{roomId}}
+###
+# Spyke makes a turn
+POST http://localhost:1337/api/lobby/turn
+Content-Type: application/x-www-form-urlencoded
+Cookie: uid=Spyke; sign=3s6Kz6koTCrG-nztextuJ1-mbpeA9FiTtp0j2ez4oGA=;
+
+cell=1
+###
+# Vlad makes a turn
+POST http://localhost:1337/api/lobby/turn
+Content-Type: application/x-www-form-urlencoded
+Cookie: uid=Vlad; sign=K66tmXIwFRn_MxiH6F7pMUQzqqTjCBLbZZ-7fvhdzGA=;
+
+cell=1
 ###
