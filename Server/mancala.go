@@ -16,12 +16,13 @@ type GameResult struct {
 }
 
 type McBoard struct {
-	P1score int      `json:"player1_score"`
-	P2score int      `json:"player2_score"`
-	P1cells []McCell `json:"player1_cells"`
-	P2cells []McCell `json:"player2_cells"`
-	P1mc    McCell   `json:"player1_mancala"`
-	P2mc    McCell   `json:"player2_mancala"`
+	P1score    int      `json:"player1_score"`
+	P2score    int      `json:"player2_score"`
+	P1cells    []McCell `json:"player1_cells"`
+	P2cells    []McCell `json:"player2_cells"`
+	P1mc       McCell   `json:"player1_mancala"`
+	P2mc       McCell   `json:"player2_mancala"`
+	NextPlayer int      `json:"next_player"`
 }
 
 func newBoard() McBoard {
@@ -48,6 +49,8 @@ func newBoard() McBoard {
 	result.P2cells[length-1].owner = 2
 	result.P1cells[length-1].next = &result.P1mc
 	result.P2cells[length-1].next = &result.P2mc
+	result.P1cells[length-1].opposite = &result.P2cells[0]
+	result.P2cells[length-1].opposite = &result.P2cells[0]
 	result.P1mc.next = &result.P2cells[0]
 	result.P2mc.next = &result.P1cells[0]
 	return result
@@ -101,22 +104,32 @@ func (cell *McCell) move() bool {
 	return false
 }
 
-func (board *McBoard) turn(player, cell int) (bool, error) {
+func (board *McBoard) turn(player, cell int) error {
+	if player != board.NextPlayer {
+		return errors.New("another player's turn")
+	}
 	if player > 2 || player < 1 {
-		return false, errors.New("invalid player id")
+		return errors.New("invalid player id")
 	}
 	if cell >= len(board.P1cells) || cell < 0 {
-		return false, errors.New("invalid cell id")
+		return errors.New("invalid cell id")
 	}
 	if player == 1 {
 		if board.P1cells[cell].Score == 0 {
-			return false, errors.New("selected an empty cell")
+			return errors.New("selected an empty cell")
 		}
-		return board.P1cells[cell].move(), nil
+
+		if !board.P1cells[cell].move() {
+			board.NextPlayer = 2
+		}
+		return nil
 	} else {
 		if board.P2cells[cell].Score == 0 {
-			return false, errors.New("selected an empty cell")
+			return errors.New("selected an empty cell")
 		}
-		return board.P2cells[cell].move(), nil
+		if !board.P2cells[cell].move() {
+			board.NextPlayer = 1
+		}
+		return nil
 	}
 }
