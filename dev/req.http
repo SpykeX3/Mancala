@@ -71,5 +71,11 @@ POST http://localhost:1337/api/lobby/turn
 Content-Type: application/x-www-form-urlencoded
 Cookie: uid=Vlad; sign=K66tmXIwFRn_MxiH6F7pMUQzqqTjCBLbZZ-7fvhdzGA=;
 
-cell=1
+cell=4
+###
+# Vlad requests state
+GET http://localhost:1337/api/lobby/state
+Content-Type: application/x-www-form-urlencoded
+Cookie: uid=Vlad; sign=K66tmXIwFRn_MxiH6F7pMUQzqqTjCBLbZZ-7fvhdzGA=;
+
 ###
