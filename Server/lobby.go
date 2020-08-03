@@ -25,6 +25,7 @@ type Lobby struct {
 	name             string
 	board            *McBoard
 	player1, player2 *Player
+	stateChan        chan string
 }
 
 //###
@@ -70,8 +71,9 @@ func hostGame(username string) string {
 			username:   "",
 			id:         1,
 		},
-		player2: nil,
-		board:   newBoard(),
+		player2:   nil,
+		board:     newBoard(),
+		stateChan: make(chan string),
 	}
 	lobbyMapMux.Unlock()
 	return roomId
@@ -101,11 +103,11 @@ func joinGame(username, roomId string) error {
 	userMapMux.Lock()
 	userMap[username] = roomId
 	userMapMux.Unlock()
-	go gameControllerRoutine(lobby.board, lobby.player1.connection, lobby.player2.connection)
+	go gameControllerRoutine(lobby.board, lobby.player1.connection, lobby.player2.connection, &lobby.stateChan)
 	return nil
 }
 
-func gameControllerRoutine(board *McBoard, player1, player2 *gcConnection) {
+func gameControllerRoutine(board *McBoard, player1, player2 *gcConnection, stateChan *chan string) {
 	for {
 		select {
 		case p1turn := <-player1.request:
@@ -129,6 +131,9 @@ func gameControllerRoutine(board *McBoard, player1, player2 *gcConnection) {
 					player2.response <- string(jsOut)
 				}
 			}
+		case *stateChan <- board.string():
+			{
+			}
 		}
 		//TODO finite game \o/
 	}
@@ -144,4 +149,22 @@ func makeTurn(username string, cell int) string {
 	}
 	connection.request <- cell
 	return <-connection.response
+}
+
+func getGameState(username string) string {
+	userMapMux.Lock()
+	room, exists := userMap[username]
+	userMapMux.Unlock()
+	if !exists {
+		err := errors.New("user is not in any game")
+		return string(wrapErrorJSON(err))
+	}
+	lobbyMapMux.Lock()
+	lobby, exists := lobbyMap[room]
+	lobbyMapMux.Unlock()
+	if !exists {
+		err := errors.New("user is not in any game")
+		return string(wrapErrorJSON(err))
+	}
+	return <-lobby.stateChan
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io/ioutil"
 	"net/http"
 	"strconv"
 )
@@ -59,5 +60,32 @@ func makeTurnHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	_, _ = w.Write([]byte(makeTurn(userCookie.Value, cell)))
+	return
+}
+
+func gameStateHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		_, _ = w.Write([]byte("Invalid method"))
+		return
+	}
+	userCookie, _ := r.Cookie("uid")
+	_, _ = w.Write([]byte(getGameState(userCookie.Value)))
+	return
+}
+
+func mainPageHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		_, _ = w.Write([]byte("Invalid method"))
+		return
+	}
+	contents, err := ioutil.ReadFile("index.html")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log("Main page was inaccessible")
+		return
+	}
+	_, _ = w.Write(contents)
 	return
 }

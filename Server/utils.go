@@ -19,3 +19,4 @@ func wrapErrorJSON(err error) []byte {
 	res, _ := json.Marshal(errorMessage{Error: err.Error()})
 	return res
 }
+

@@ -1,6 +1,9 @@
 package main
 
-import "errors"
+import (
+	"encoding/json"
+	"errors"
+)
 
 type McCell struct {
 	Score    int `json:"Score"`
@@ -139,4 +142,9 @@ func (board *McBoard) turn(player, cell int) error {
 		}
 		return nil
 	}
+}
+
+func (board McBoard) string() string {
+	jsOut, _ := json.Marshal(board)
+	return string(jsOut)
 }

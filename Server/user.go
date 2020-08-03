@@ -3,15 +3,25 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 )
 
 func AuthMiddleware(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	notAuth := []string{"/api/user/new", "/api/user/login"} //Список эндпоинтов, для которых не требуется авторизация
-	requestPath := r.URL.Path                               //текущий путь запроса
+	notAuth := []string{"/api/user/new", "/api/user/login", "/"}
+	notAuthPrefix := []string{"/js/"}
+	requestPath := r.URL.Path
+	println("Path is '",requestPath,"'")
 	for _, value := range notAuth {
-
+		println("Has special path")
 		if value == requestPath {
+			next(w, r)
+			return
+		}
+	}
+	for _, value := range notAuthPrefix {
+		if strings.HasPrefix(requestPath, value) {
+			println("Has special path prefix")
 			next(w, r)
 			return
 		}
