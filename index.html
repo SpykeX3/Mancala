@@ -1,17 +1,148 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
-    <!-- development version, includes helpful console warnings -->
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Mancala</title>
+    <script type="application/javascript" src="https://unpkg.com/react@16.0.0/umd/react.production.min.js"></script>
+    <script type="application/javascript"
+            src="https://unpkg.com/react-dom@16.0.0/umd/react-dom.production.min.js"></script>
+    <script type="application/javascript" src="https://unpkg.com/babel-standalone@6.26.0/babel.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css">
 
 </head>
+
 <body>
-<div id="app">
-    {{ info }}
-</div>
-<script src="/js/app.js"></script>
+<div id="root"></div>
+
+<script type="text/babel">
+    // Obtain the root
+    const React = require("../../../.config/JetBrains/WebStorm2020.2/javascript/extLibs/http_unpkg.com_react@16_umd_react.development");
+    const rootElement = document.getElementById('root')
+
+    function GameCell(props) {
+        return (
+            <button className="btn btn-danger p-3 m-3" onClick={props.onClick}>
+                {props.value}
+            </button>
+        );
+    }
+
+
+    function MancalaCell(props) {
+        return (
+            <button
+                className="btn btn-danger py-5 px-3 m-3 d-inline"
+            >
+                {props.value}
+            </button>
+        );
+
+    }
+
+    // Create a ES6 class component
+    class Board extends React.Component {
+// Use the render function to return JSX component
+        constructor(props) {
+            super(props);
+            this.state = {
+                player1_cells: Array(6).fill(4),
+                player2_cells: Array(6).fill(4),
+                player1_mancala: 0,
+                player2_mancala: 0,
+            };
+        }
+
+        renderP1Cell(i) {
+            return <GameCell
+                value={this.state.player1_cells[i]}
+                onClick={() => this.handleP1Click(i)}/>
+        }
+
+        renderP2Cell(i) {
+            return <GameCell
+                value={this.state.player2_cells[i]}
+                onClick={() => this.handleP2Click(i)}/>
+        }
+
+        renderP1Mancala() {
+            return <MancalaCell
+                value={this.state.player1_mancala}/>
+        }
+
+        renderP2Mancala() {
+            return <MancalaCell
+                value={this.state.player2_mancala}/>
+        }
+
+        handleP1Click(i) {
+            const cells = this.state.player1_cells.slice();
+            cells[i] = 0;
+            // 5. Set the state to our new copy
+            this.setState({player1_cells: cells})
+        }
+
+        handleP2Click(i) {
+            alert(i);
+        }
+
+        render() {
+            return (
+                <div className="game-board">
+                    <h1>The game of Mancala</h1>
+                    <div className="container bg-primary d-flex flex-wrap">
+                        <div className="row justify-content-center">
+                            {this.renderP2Mancala()}
+                            <div>
+                                {this.renderP2Cell(5)}
+                                {this.renderP2Cell(4)}
+                                {this.renderP2Cell(3)}
+                                {this.renderP2Cell(2)}
+                                {this.renderP2Cell(1)}
+                                {this.renderP2Cell(0)}
+                            </div>
+                        </div>
+                        <br/>
+                        <div className="row flex-grow-1 justify-content-center ">
+                            <div className="w-100 justify-content-center">
+                                <div className="min-vh-100 d-inline align-text-top">
+                                    {this.renderP1Cell(0)}
+                                    {this.renderP1Cell(1)}
+                                    {this.renderP1Cell(2)}
+                                    {this.renderP1Cell(3)}
+                                    {this.renderP1Cell(4)}
+                                    {this.renderP1Cell(5)}
+                                </div>
+                                {this.renderP1Mancala()}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+    }
+
+    // Create a function to wrap up your component
+    function App() {
+        return (
+            <div>
+                <Board/>
+            </div>
+        )
+    }
+
+
+    // Use the ReactDOM.render to show your component on the browser
+    ReactDOM.render(
+        <App/>,
+        rootElement
+    )
+</script>
+
 </body>
+<style>
+    .vh-100 {
+        min-height: 100vh;
+    }
+</style>
 </html>
