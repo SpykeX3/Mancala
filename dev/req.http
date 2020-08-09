@@ -5,6 +5,13 @@ Content-Type: application/x-www-form-urlencoded
 username=Spyke&password=qwerty
 
 ###
+# Sign up 1 with another password
+POST http://localhost:1337/api/user/new
+Content-Type: application/x-www-form-urlencoded
+
+username=Spyke&password=12345
+
+###
 # Sign up 2
 POST http://localhost:1337/api/user/new
 Content-Type: application/x-www-form-urlencoded
