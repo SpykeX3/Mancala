@@ -1,11 +1,13 @@
 package main
 
 import (
+	"Mancala/Server/Mancala"
 	"crypto"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
+	log2 "log"
 	"sync"
 	"time"
 )
@@ -23,7 +25,7 @@ type gcConnection struct {
 
 type Lobby struct {
 	name             string
-	board            *McBoard
+	board            *Mancala.McBoard
 	player1, player2 *Player
 	stateChan        chan string
 }
@@ -63,8 +65,7 @@ func hostGame(username string) string {
 	connectionMap[username] = p1Connection
 	connectionMapMux.Unlock()
 
-	lobbyMapMux.Lock()
-	lobbyMap[roomId] = &Lobby{
+	lobby := &Lobby{
 		name: "Lobby of " + username,
 		player1: &Player{
 			connection: p1Connection,
@@ -72,9 +73,12 @@ func hostGame(username string) string {
 			id:         1,
 		},
 		player2:   nil,
-		board:     newBoard(),
+		board:     Mancala.NewBoard(),
 		stateChan: make(chan string),
 	}
+	lobby.board.Players[0] = username
+	lobbyMapMux.Lock()
+	lobbyMap[roomId] = lobby
 	lobbyMapMux.Unlock()
 	return roomId
 }
@@ -99,6 +103,7 @@ func joinGame(username, roomId string) error {
 		username:   username,
 		id:         2,
 	}
+	lobby.board.Players[1] = username
 	lobbyMapMux.Unlock()
 	userMapMux.Lock()
 	userMap[username] = roomId
@@ -107,12 +112,16 @@ func joinGame(username, roomId string) error {
 	return nil
 }
 
-func gameControllerRoutine(board *McBoard, player1, player2 *gcConnection, stateChan *chan string) {
+func gameControllerRoutine(board *Mancala.McBoard, player1, player2 *gcConnection, stateChan *chan string) {
+	killer := make(chan bool, 0)
+	if board.Result.GameOver {
+		time.AfterFunc(time.Minute*60, func() { killer <- true })
+	}
 	for {
 		select {
 		case p1turn := <-player1.request:
 			{
-				err := board.turn(1, p1turn)
+				err := board.Turn(1, p1turn)
 				if err != nil {
 					player1.response <- string(wrapErrorJSON(err))
 				} else {
@@ -123,7 +132,7 @@ func gameControllerRoutine(board *McBoard, player1, player2 *gcConnection, state
 			}
 		case p2turn := <-player2.request:
 			{
-				err := board.turn(2, p2turn)
+				err := board.Turn(2, p2turn)
 				if err != nil {
 					player2.response <- string(wrapErrorJSON(err))
 				} else {
@@ -131,11 +140,18 @@ func gameControllerRoutine(board *McBoard, player1, player2 *gcConnection, state
 					player2.response <- string(jsOut)
 				}
 			}
-		case *stateChan <- board.string():
+		case *stateChan <- board.String():
 			{
 			}
+		case <-killer:
+			{
+				log2.Println("Leaving gameController goroutine for users", board.Players)
+				return
+			}
 		}
-		//TODO finite game \o/
+		if board.Result.GameOver {
+			time.AfterFunc(time.Second*10, func() { killer <- true })
+		}
 	}
 }
 

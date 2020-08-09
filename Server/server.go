@@ -10,6 +10,7 @@ import (
 
 var CookieKey []byte
 var port string
+var mongoURI string
 
 func initFromEnv() {
 	wd, err := os.Getwd()
@@ -35,6 +36,8 @@ func initFromEnv() {
 	if port == "" {
 		port = "8080"
 	}
+	passwd := os.Getenv("MONGO_PASS")
+	mongoURI = "mongodb+srv://mancala-app:" + passwd + "@mancala.vzg1d.mongodb.net/mancala?retryWrites=true&w=majority"
 	CookieKey = []byte(key)
 	println("KEY:", key)
 	println("PORT:", port)
@@ -56,6 +59,7 @@ func main() {
 	n.Use(negroni.NewLogger())
 	n.UseFunc(AuthMiddleware)
 	n.UseHandler(router)
+	initDBClient(mongoURI)
 	err := http.ListenAndServe(":"+port, n)
 	if err != nil {
 		panic(err.Error())
