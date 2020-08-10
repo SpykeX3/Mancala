@@ -2,10 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/howeyc/gopass"
+	"golang.org/x/crypto/ssh/terminal"
 	"log"
 	"net/url"
+	"runtime"
 	"strings"
+	"syscall"
 	"time"
 )
 
@@ -64,11 +66,15 @@ func readCredentials() (string, string) {
 	fmt.Println("Username:")
 	username = readString()
 	fmt.Println("Password:")
-	passwordBytes, err := gopass.GetPasswd()
-	if err != nil {
-		log.Panicln("Failed to read url")
+	if runtime.GOOS == "windows" {
+		password = readString()
+	} else {
+		passwordBytes, err := terminal.ReadPassword(int(syscall.Stdin))
+		if err != nil {
+			log.Panicln("Failed to read password")
+		}
+		password = string(passwordBytes)
 	}
-	password = string(passwordBytes)
 	return username, password
 }
 
@@ -137,6 +143,7 @@ func main() {
 				} else {
 					fmt.Println(board.Result.Winner, "wins")
 				}
+				fmt.Println(board.Printable(username))
 				user.LeaveLobby()
 				break
 			}
