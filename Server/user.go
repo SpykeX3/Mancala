@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -29,19 +30,19 @@ func AuthMiddleware(w http.ResponseWriter, r *http.Request, next http.HandlerFun
 	}
 	userCookie, err := r.Cookie("uid")
 	if err != nil {
-		log(err.Error())
+		log.Println(err.Error())
 		_, _ = w.Write(wrapErrorJSON(errors.New("no username was provided")))
 		return
 	}
 	signCookie, err := r.Cookie("sign")
 	if err != nil {
-		log(err.Error())
+		log.Println(err.Error())
 		_, _ = w.Write(wrapErrorJSON(errors.New("no signature was provided")))
 		return
 	}
 	sign, err := url.QueryUnescape(signCookie.Value)
 	if err != nil {
-		log(err.Error())
+		log.Println(err.Error())
 		_, _ = w.Write(wrapErrorJSON(errors.New("no signature was provided")))
 		return
 	}

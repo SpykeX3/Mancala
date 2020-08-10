@@ -2,6 +2,7 @@ package main
 
 import (
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -83,7 +84,7 @@ func mainPageHandler(w http.ResponseWriter, r *http.Request) {
 	contents, err := ioutil.ReadFile("index.html")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		log("Main page was inaccessible")
+		log.Println("Main page was inaccessible")
 		return
 	}
 	_, _ = w.Write(contents)
