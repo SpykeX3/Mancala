@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	log2 "log"
+	"log"
 	"sync"
 	"time"
 )
@@ -114,8 +114,12 @@ func joinGame(username, roomId string) error {
 
 func gameControllerRoutine(board *Mancala.McBoard, player1, player2 *gcConnection, stateChan *chan string) {
 	killer := make(chan bool, 0)
+	killOnce := sync.Once{}
 	if board.Result.GameOver {
-		time.AfterFunc(time.Minute*60, func() { killer <- true })
+		time.AfterFunc(time.Minute*60, func() {
+			//log.Println("Sending timeout signal")
+			killer <- true
+		})
 	}
 	for {
 		select {
@@ -145,12 +149,17 @@ func gameControllerRoutine(board *Mancala.McBoard, player1, player2 *gcConnectio
 			}
 		case <-killer:
 			{
-				log2.Println("Leaving gameController goroutine for users", board.Players)
+				log.Println("Leaving gameController goroutine for users", board.Players)
 				return
 			}
 		}
 		if board.Result.GameOver {
-			time.AfterFunc(time.Second*10, func() { killer <- true })
+			killOnce.Do(func() {
+				time.AfterFunc(time.Second*10, func() {
+					//log.Println("Game is finished, sending killing signal")
+					killer <- true
+				})
+			})
 		}
 	}
 }

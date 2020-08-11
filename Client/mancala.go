@@ -61,7 +61,9 @@ func (board McBoard) Printable(username string) string {
 		sb.WriteString(" ")
 		sb.WriteString(opponentCells[length-1-i].String())
 	}
-	sb.WriteString("\t\tNext is:" + board.Players[board.NextPlayer-1])
+	if board.NextPlayer > 0 {
+		sb.WriteString("\t\tNext is:" + board.Players[board.NextPlayer-1])
+	}
 	sb.WriteString("\n")
 	sb.WriteString("      ")
 	for _, cell := range playerCells {

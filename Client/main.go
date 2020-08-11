@@ -129,7 +129,7 @@ func main() {
 		lastUpdatedState := 0
 		for true {
 			// Get board state
-			board, err := user.GetGameState() //TODO show if game has changed
+			board, err := user.GetGameState()
 			if err != nil {
 				fmt.Println(err.Error())
 				time.Sleep(time.Second)
