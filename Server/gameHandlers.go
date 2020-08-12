@@ -10,7 +10,7 @@ import (
 func createLobbyHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
-		_, _ = w.Write([]byte("Invalid method"))
+		_, _ = w.Write(newErrorJSON("Invalid method"))
 		return
 	}
 	userCookie, _ := r.Cookie("uid")
@@ -22,19 +22,19 @@ func createLobbyHandler(w http.ResponseWriter, r *http.Request) {
 func joinLobbyHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
-		_, _ = w.Write([]byte("Invalid method"))
+		_, _ = w.Write(newErrorJSON("Invalid method"))
 		return
 	}
 	err := r.ParseForm()
 	if err != nil {
-		_, _ = w.Write([]byte(err.Error()))
+		_, _ = w.Write(wrapErrorJSON(err))
 		return
 	}
 	roomId := r.Form.Get("room")
 	userCookie, _ := r.Cookie("uid")
 	err = joinGame(userCookie.Value, roomId)
 	if err != nil {
-		_, _ = w.Write([]byte(err.Error()))
+		_, _ = w.Write(wrapErrorJSON(err))
 		return
 	}
 	_, _ = w.Write([]byte("Connected to " + roomId))
@@ -44,12 +44,12 @@ func joinLobbyHandler(w http.ResponseWriter, r *http.Request) {
 func makeTurnHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
-		_, _ = w.Write([]byte("Invalid method"))
+		_, _ = w.Write(newErrorJSON("Invalid method"))
 		return
 	}
 	err := r.ParseForm()
 	if err != nil {
-		_, _ = w.Write([]byte(err.Error()))
+		_, _ = w.Write(wrapErrorJSON(err))
 		return
 	}
 	userCookie, _ := r.Cookie("uid")
@@ -67,7 +67,7 @@ func makeTurnHandler(w http.ResponseWriter, r *http.Request) {
 func gameStateHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		w.WriteHeader(http.StatusMethodNotAllowed)
-		_, _ = w.Write([]byte("Invalid method"))
+		_, _ = w.Write(newErrorJSON("Invalid method"))
 		return
 	}
 	userCookie, _ := r.Cookie("uid")
@@ -78,7 +78,7 @@ func gameStateHandler(w http.ResponseWriter, r *http.Request) {
 func mainPageHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		w.WriteHeader(http.StatusMethodNotAllowed)
-		_, _ = w.Write([]byte("Invalid method"))
+		_, _ = w.Write(newErrorJSON("Invalid method"))
 		return
 	}
 	contents, err := ioutil.ReadFile("elm/index.html")

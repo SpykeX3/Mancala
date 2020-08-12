@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -31,19 +30,19 @@ func AuthMiddleware(w http.ResponseWriter, r *http.Request, next http.HandlerFun
 	userCookie, err := r.Cookie("uid")
 	if err != nil {
 		log.Println(err.Error())
-		_, _ = w.Write(wrapErrorJSON(errors.New("no username was provided")))
+		_, _ = w.Write(newErrorJSON("no username was provided"))
 		return
 	}
 	signCookie, err := r.Cookie("sign")
 	if err != nil {
 		log.Println(err.Error())
-		_, _ = w.Write(wrapErrorJSON(errors.New("no signature was provided")))
+		_, _ = w.Write(newErrorJSON("no signature was provided"))
 		return
 	}
 	sign, err := url.QueryUnescape(signCookie.Value)
 	if err != nil {
 		log.Println(err.Error())
-		_, _ = w.Write(wrapErrorJSON(errors.New("no signature was provided")))
+		_, _ = w.Write(newErrorJSON("no signature was provided"))
 		return
 	}
 	passed, err := checkAuthentication(userCookie.Value, sign)
@@ -72,7 +71,7 @@ func setUserCookie(w http.ResponseWriter, username string) {
 func createUserHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
-		_, _ = w.Write(wrapErrorJSON(errors.New("invalid method")))
+		_, _ = w.Write(newErrorJSON("invalid method"))
 		return
 	}
 	err := r.ParseForm()
@@ -83,11 +82,11 @@ func createUserHandler(w http.ResponseWriter, r *http.Request) {
 	username := r.Form.Get("username")
 	password := r.Form.Get("password")
 	if username == "" || password == "" {
-		_, _ = w.Write(wrapErrorJSON(errors.New("some fields were empty")))
+		_, _ = w.Write(newErrorJSON("some fields were empty"))
 		return
 	}
 	if userExists(username) {
-		_, _ = w.Write(wrapErrorJSON(errors.New("user already exists")))
+		_, _ = w.Write(newErrorJSON("user already exists"))
 		return
 	}
 	addUser(username, password)
@@ -98,7 +97,7 @@ func createUserHandler(w http.ResponseWriter, r *http.Request) {
 func loginUserHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
-		_, _ = w.Write(wrapErrorJSON(errors.New("invalid method")))
+		_, _ = w.Write(newErrorJSON("invalid method"))
 		return
 	}
 	err := r.ParseForm()
@@ -109,7 +108,7 @@ func loginUserHandler(w http.ResponseWriter, r *http.Request) {
 	username := r.Form.Get("username")
 	password := r.Form.Get("password")
 	if !checkPassword(username, password) {
-		_, _ = w.Write(wrapErrorJSON(errors.New("invalid credentials")))
+		_, _ = w.Write(newErrorJSON("invalid credentials"))
 		return
 	}
 	setUserCookie(w, username)
