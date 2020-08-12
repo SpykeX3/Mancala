@@ -81,7 +81,7 @@ func mainPageHandler(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write([]byte("Invalid method"))
 		return
 	}
-	contents, err := ioutil.ReadFile("index.html")
+	contents, err := ioutil.ReadFile("elm/index.html")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		log.Println("Main page was inaccessible")
