@@ -18,3 +18,5 @@
 .idea
 go.sum
 build
+elm/elm-stuff
+elm/index.html
