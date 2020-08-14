@@ -85,15 +85,24 @@ func hostGame(username string) string {
 
 func joinGame(username, roomId string) error {
 	lobbyMapMux.Lock()
+	defer lobbyMapMux.Unlock()
 	lobby, exists := lobbyMap[roomId]
 	if !exists {
-		lobbyMapMux.Unlock()
 		return errors.New("invalid room identifier")
 	}
 	if lobby.player2 != nil {
-		lobbyMapMux.Unlock()
 		return errors.New("lobby is full")
 	}
+
+	userMapMux.Lock()
+	currentRoom, inRoom := userMap[username]
+	if inRoom && currentRoom == roomId {
+		userMapMux.Unlock()
+		return errors.New("user is already in room")
+	}
+	userMap[username] = roomId
+	userMapMux.Unlock()
+
 	connectionMapMux.Lock()
 	p2Connection := newGCConnection()
 	connectionMap[username] = p2Connection
@@ -104,10 +113,6 @@ func joinGame(username, roomId string) error {
 		id:         2,
 	}
 	lobby.board.Players[1] = username
-	lobbyMapMux.Unlock()
-	userMapMux.Lock()
-	userMap[username] = roomId
-	userMapMux.Unlock()
 	go gameControllerRoutine(lobby.board, lobby.player1.connection, lobby.player2.connection, &lobby.stateChan)
 	return nil
 }
@@ -117,7 +122,6 @@ func gameControllerRoutine(board *Mancala.McBoard, player1, player2 *gcConnectio
 	killOnce := sync.Once{}
 	if board.Result.GameOver {
 		time.AfterFunc(time.Minute*60, func() {
-			//log.Println("Sending timeout signal")
 			killer <- true
 		})
 	}
@@ -172,8 +176,13 @@ func makeTurn(username string, cell int) string {
 		err := errors.New("user is not in any game")
 		return string(wrapErrorJSON(err))
 	}
-	connection.request <- cell
-	return <-connection.response
+	select {
+	case connection.request <- cell:
+		return <-connection.response
+	default:
+		err := errors.New("game is not active")
+		return string(wrapErrorJSON(err))
+	}
 }
 
 func getGameState(username string) string {
@@ -191,5 +200,11 @@ func getGameState(username string) string {
 		err := errors.New("user is not in any game")
 		return string(wrapErrorJSON(err))
 	}
-	return <-lobby.stateChan
+	select {
+	case resp := <-lobby.stateChan:
+		return resp
+	default:
+		err := errors.New("game is not active")
+		return string(wrapErrorJSON(err))
+	}
 }
