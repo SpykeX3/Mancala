@@ -10,7 +10,7 @@ import (
 
 func AuthMiddleware(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	notAuth := []string{"/api/user/new", "/api/user/login", "/"}
-	notAuthPrefix := []string{"/js/"}
+	notAuthPrefix := []string{"/js/", "/debug/"}
 	requestPath := r.URL.Path
 	println("Path is '", requestPath, "'")
 	for _, value := range notAuth {
