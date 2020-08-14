@@ -7,7 +7,7 @@ import (
 )
 
 type McCell struct {
-	Score    int `json:"Score"`
+	Score    int `json:"score"`
 	owner    int8
 	board    *McBoard
 	next     *McCell
@@ -144,14 +144,14 @@ func (cell *McCell) move() bool {
 }
 
 func (board *McBoard) Turn(player, cell int) error {
-	if player != board.NextPlayer {
-		return errors.New("another player's turn")
-	}
 	if board.Result.GameOver {
 		return errors.New("game is over")
 	}
 	if player > 2 || player < 1 {
 		return errors.New("invalid player id")
+	}
+	if player != board.NextPlayer {
+		return errors.New("another player's turn")
 	}
 	if cell >= len(board.P1cells) || cell < 0 {
 		return errors.New("invalid cell id")

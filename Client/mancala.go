@@ -7,7 +7,7 @@ import (
 )
 
 type McCell struct {
-	Score int `json:"Score"`
+	Score int `json:"score"`
 }
 
 type GameResult struct {
