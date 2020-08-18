@@ -239,7 +239,7 @@ updateLogin msg model =
         LoginPressed ->
             ( model
             , Http.post
-                { url = "http://localhost:1337/api/user/login"
+                { url = "/api/user/login"
                 , body = Http.stringBody "application/x-www-form-urlencoded" ("username=" ++ model.loginData.username ++ "&password=" ++ model.loginData.password)
                 , expect = Http.expectString (\a -> LoginMessages (GotLoginResp a))
                 }
@@ -297,7 +297,7 @@ updateRegister msg model =
         RegisterPressed ->
             ( model
             , Http.post
-                { url = "http://localhost:1337/api/user/new"
+                { url = "/api/user/new"
                 , body = Http.stringBody "application/x-www-form-urlencoded" ("username=" ++ model.registerData.username ++ "&password=" ++ model.registerData.password)
                 , expect = Http.expectString (\a -> RegisterMessages (GotRegisterResp a))
                 }
@@ -347,7 +347,7 @@ updateLobby msg model =
         HostGame ->
             ( model
             , Http.post
-                { url = "http://localhost:1337/api/lobby/create"
+                { url = "/api/lobby/create"
                 , body = Http.stringBody "application/x-www-form-urlencoded" ""
                 , expect = Http.expectString (\a -> LobbyMsg (GotHostResponse a))
                 }
@@ -356,7 +356,7 @@ updateLobby msg model =
         JoinGame _ ->
             ( model
             , Http.post
-                { url = "http://localhost:1337/api/lobby/join"
+                { url = "/api/lobby/join"
                 , body = Http.stringBody "application/x-www-form-urlencoded" ("room=" ++ model.lobbyData.inputRoom)
                 , expect = Http.expectString (\a -> LobbyMsg (GotJoinResponse a))
                 }
@@ -449,7 +449,7 @@ metadataBoard =
 
 getGameStateRequest =
     Http.get
-        { url = "http://localhost:1337/api/lobby/state"
+        { url = "/api/lobby/state"
         , expect = Http.expectString (\a -> GameMsg (GotStateResponse a))
         }
 
@@ -550,7 +550,7 @@ updateGame msg model =
         MakeTurn int ->
             ( model
             , Http.post
-                { url = "http://localhost:1337/api/lobby/turn"
+                { url = "/api/lobby/turn"
                 , body = Http.stringBody "application/x-www-form-urlencoded" ("cell=" ++ String.fromInt int)
                 , expect = Http.expectString (\a -> GameMsg (GotTurnResponse a))
                 }
