@@ -1,0 +1,7 @@
+build
+.idea
+.env
+dev
+Client
+elm/elm-stuff
+elm/index.htmlp
