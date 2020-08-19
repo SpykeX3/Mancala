@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"net/url"
@@ -15,14 +14,14 @@ func AuthMiddleware(w http.ResponseWriter, r *http.Request, next http.HandlerFun
 	println("Path is '", requestPath, "'")
 	for _, value := range notAuth {
 		if value == requestPath {
-			println("Has special path", value)
+			//println("Has special path", value)
 			next(w, r)
 			return
 		}
 	}
 	for _, value := range notAuthPrefix {
 		if strings.HasPrefix(requestPath, value) {
-			println("Has special path prefix", value)
+			//println("Has special path prefix", value)
 			next(w, r)
 			return
 		}
@@ -50,7 +49,7 @@ func AuthMiddleware(w http.ResponseWriter, r *http.Request, next http.HandlerFun
 		_, _ = w.Write(wrapErrorJSON(err))
 		return
 	}
-	fmt.Println("User: ", userCookie.Value)
+	log.Println("User: ", userCookie.Value)
 	next(w, r)
 }
 
