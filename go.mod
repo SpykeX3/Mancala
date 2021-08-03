@@ -4,12 +4,9 @@ go 1.14
 
 require (
 	github.com/gorilla/mux v1.7.4
-	github.com/howeyc/gopass v0.0.0-20190910152052-7cb4b85ec19c
-	github.com/ipfs/go-log v1.0.4
 	github.com/joho/godotenv v1.3.0
-	github.com/multiformats/go-multibase v0.0.3
 	github.com/pkg/errors v0.9.1
 	github.com/urfave/negroni v1.0.0
-	go.mongodb.org/mongo-driver v1.4.0
-	golang.org/x/crypto v0.0.0-20190530122614-20be4c3c3ed5
+	go.mongodb.org/mongo-driver v1.5.1
+	golang.org/x/crypto v0.0.0-20200302210943-78000ba7a073
 )
